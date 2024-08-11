@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 06, 2024 at 04:48 PM
+-- Generation Time: Aug 11, 2024 at 01:33 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -43,7 +43,9 @@ CREATE TABLE `anggota` (
 INSERT INTO `anggota` (`id_anggota`, `nama`, `alamat`, `telepon`, `email`, `tanggal_daftar`) VALUES
 (7, 'Nuaru', 'Jl Nuaru No 1', '111111', 'nuaru@gmail.com', '2024-08-01'),
 (9, 'bar', 'Jl Semarang No 90', '08585000', 'bar@gmail.com', '2024-08-02'),
-(11, 'Amar1', 'UK', '202011420026', 'amar@gmail.com', '2024-08-06');
+(11, 'Amar1', 'UK', '202011420026', 'amar@gmail.com', '2024-08-06'),
+(14, 'tata', 'Jl Tata No 2', '08123', 'tata@gmail.com', '2024-08-11'),
+(15, 'aku', 'Jl Aku', '0881', 'aku@gmail.com', '2024-08-11');
 
 -- --------------------------------------------------------
 
@@ -57,21 +59,6 @@ CREATE TABLE `angsuran` (
   `jumlah_angsuran` decimal(15,2) NOT NULL,
   `tanggal_bayar` date NOT NULL,
   `status` enum('dibayar','tertunda') DEFAULT 'tertunda'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `bunga`
---
-
-CREATE TABLE `bunga` (
-  `id_bunga` int(11) NOT NULL,
-  `id_anggota` int(11) DEFAULT NULL,
-  `jumlah_pinjaman` decimal(15,2) NOT NULL,
-  `tanggal_pinjaman` date NOT NULL,
-  `persentase_bunga` decimal(5,2) NOT NULL,
-  `jumlah_bunga` decimal(15,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -93,7 +80,8 @@ CREATE TABLE `petugas` (
 --
 
 INSERT INTO `petugas` (`id_petugas`, `nama`, `telepon`, `email`, `tanggal_masuk`) VALUES
-(3, 'dwi', '0822', 'dwi@gmail.com', '2024-08-03');
+(3, 'dwi', '0822', 'dwi@gmail.com', '2024-08-03'),
+(4, 'tono', '0232', 'tono@gmail.com', '2024-08-11');
 
 -- --------------------------------------------------------
 
@@ -170,7 +158,8 @@ CREATE TABLE `simpanan_wajib` (
 --
 
 INSERT INTO `simpanan_wajib` (`id_simpanan_wajib`, `id_anggota`, `jumlah`, `tanggal`) VALUES
-(1, 7, 500000.00, '2024-08-01');
+(1, 7, 500000.00, '2024-08-01'),
+(4, 7, 50000.00, '0000-00-00');
 
 -- --------------------------------------------------------
 
@@ -180,12 +169,39 @@ INSERT INTO `simpanan_wajib` (`id_simpanan_wajib`, `id_anggota`, `jumlah`, `tang
 
 CREATE TABLE `transaksi` (
   `id_transaksi` int(11) NOT NULL,
-  `id_anggota` int(11) DEFAULT NULL,
-  'id_petugas'  int(11) DEFAULT NULL,
-  `jenis_transaksi` enum('Simpanan Wajib','Simpanan Pokok') DEFAULT NULL,
-  `jumlah` decimal(15,2) NOT NULL,
-  `tanggal` date DEFAULT NULL
+  `id_anggota` int(11) NOT NULL,
+  `jenis_simpanan` enum('simpanan_wajib','simpanan_pokok') NOT NULL,
+  `jumlah` decimal(10,2) NOT NULL,
+  `tanggal` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `transaksi`
+--
+
+INSERT INTO `transaksi` (`id_transaksi`, `id_anggota`, `jenis_simpanan`, `jumlah`, `tanggal`) VALUES
+(1, 7, 'simpanan_wajib', 500000.00, '2024-08-01');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `email`, `password`, `created_at`) VALUES
+(1, 'akbar', 'akbar@gmail.com', '$2y$10$SPHNrv3FTYNYjoeLcz34juFkg0OgGI7S8t2dA450wOqEYxgWNpKK6', '2024-08-11 09:36:08');
 
 --
 -- Indexes for dumped tables
@@ -204,13 +220,6 @@ ALTER TABLE `anggota`
 ALTER TABLE `angsuran`
   ADD PRIMARY KEY (`id_angsuran`),
   ADD KEY `id_pinjaman` (`id_pinjaman`);
-
---
--- Indexes for table `bunga`
---
-ALTER TABLE `bunga`
-  ADD PRIMARY KEY (`id_bunga`),
-  ADD KEY `id_anggota` (`id_anggota`);
 
 --
 -- Indexes for table `petugas`
@@ -256,6 +265,14 @@ ALTER TABLE `transaksi`
   ADD KEY `id_anggota` (`id_anggota`);
 
 --
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -263,7 +280,7 @@ ALTER TABLE `transaksi`
 -- AUTO_INCREMENT for table `anggota`
 --
 ALTER TABLE `anggota`
-  MODIFY `id_anggota` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_anggota` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `angsuran`
@@ -272,16 +289,10 @@ ALTER TABLE `angsuran`
   MODIFY `id_angsuran` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `bunga`
---
-ALTER TABLE `bunga`
-  MODIFY `id_bunga` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `petugas`
 --
 ALTER TABLE `petugas`
-  MODIFY `id_petugas` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_petugas` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `pinjaman`
@@ -305,13 +316,19 @@ ALTER TABLE `simpanan_pokok`
 -- AUTO_INCREMENT for table `simpanan_wajib`
 --
 ALTER TABLE `simpanan_wajib`
-  MODIFY `id_simpanan_wajib` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_simpanan_wajib` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `transaksi`
 --
 ALTER TABLE `transaksi`
-  MODIFY `id_transaksi` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_transaksi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables
@@ -322,12 +339,6 @@ ALTER TABLE `transaksi`
 --
 ALTER TABLE `angsuran`
   ADD CONSTRAINT `angsuran_ibfk_1` FOREIGN KEY (`id_pinjaman`) REFERENCES `pinjaman` (`id_pinjaman`);
-
---
--- Constraints for table `bunga`
---
-ALTER TABLE `bunga`
-  ADD CONSTRAINT `bunga_ibfk_1` FOREIGN KEY (`id_anggota`) REFERENCES `anggota` (`id_anggota`);
 
 --
 -- Constraints for table `pinjaman`
@@ -359,8 +370,6 @@ ALTER TABLE `simpanan_wajib`
 --
 ALTER TABLE `transaksi`
   ADD CONSTRAINT `transaksi_ibfk_1` FOREIGN KEY (`id_anggota`) REFERENCES `anggota` (`id_anggota`);
-  ADD CONSTRAINT `transaksi_ibfk_1` FOREIGN KEY (`id_petugas`) REFERENCES `anggota` (`id_petugas`);
-
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
